@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GameTrc</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+
+  <!-- ═══════════════════ SIDEBAR ═══════════════════ -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="2" y="6" width="20" height="12" rx="2"/>
+          <path d="M6 12h4M8 10v4M15 11h2M15 13h2"/>
+        </svg>
+      </div>
+      <span class="brand-name">ARCHIVE</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <button class="nav-item active" data-view="library">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+          <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+        </svg>
+        <span>Library</span>
+      </button>
+      <button class="nav-item" data-view="backlog">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
+          <rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/>
+        </svg>
+        <span>Backlog</span>
+      </button>
+      <button class="nav-item" data-view="wishlist">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+        <span>Wishlist</span>
+      </button>
+      <button class="nav-item" data-view="stats">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M18 20V10M12 20V4M6 20v-6"/>
+        </svg>
+        <span>Stats</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-filters" id="sidebarFilters">
+      <p class="filter-section-label">PLATFORM</p>
+      <div class="filter-chips" id="platformFilters"></div>
+      <p class="filter-section-label">STATUS</p>
+      <div class="filter-chips" id="statusFilters">
+        <button class="chip active" data-status="">All</button>
+        <button class="chip" data-status="Playing">Playing</button>
+        <button class="chip" data-status="Completed">Completed</button>
+        <button class="chip" data-status="Dropped">Dropped</button>
+        <button class="chip" data-status="NotStarted">Not Started</button>
+      </div>
+      <p class="filter-section-label">GENRE</p>
+      <div class="filter-chips" id="genreFilters"></div>
+    </div>
+
+    <button class="add-btn" id="addGameBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 5v14M5 12h14"/>
+      </svg>
+      Add Game
+    </button>
+  </aside>
+
+  <!-- ═══════════════════ MAIN CONTENT ═══════════════════ -->
+  <main class="main">
+
+    <!-- Top bar -->
+    <header class="topbar">
+      <div class="search-wrap">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input id="searchInput" type="text" placeholder="Search titles, franchises, notes…" />
+        <kbd>⌘K</kbd>
+      </div>
+      <div class="topbar-right">
+        <div class="sort-wrap">
+          <label>Sort</label>
+          <select id="sortSelect">
+            <option value="UpdatedAt">Recently Updated</option>
+            <option value="Title">Title A–Z</option>
+            <option value="ReleaseDate">Release Date</option>
+            <option value="Rating">Rating</option>
+            <option value="PlaytimeHours">Playtime</option>
+            <option value="ProgressPercent">Progress</option>
+          </select>
+        </div>
+        <div class="view-toggle">
+          <button class="view-btn active" id="gridViewBtn" title="Grid view">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+              <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+            </svg>
+          </button>
+          <button class="view-btn" id="listViewBtn" title="List view">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Views -->
+    <div class="view-container" id="viewContainer">
+
+      <!-- ── Library / Backlog / Wishlist View ── -->
+      <div class="view active" id="libraryView">
+        <div class="view-header">
+          <h1 class="view-title" id="viewTitle">Library</h1>
+          <span class="game-count" id="gameCount">— games</span>
+        </div>
+        <div class="game-grid" id="gameGrid"></div>
+        <div class="empty-state hidden" id="emptyState">
+          <div class="empty-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+              <rect x="2" y="6" width="20" height="12" rx="2"/>
+              <path d="M6 12h4M8 10v4M15 11h2M15 13h2"/>
+            </svg>
+          </div>
+          <p class="empty-title">No games found</p>
+          <p class="empty-sub">Try adjusting your filters or add a new game.</p>
+        </div>
+      </div>
+
+      <!-- ── Stats View ── -->
+      <div class="view" id="statsView">
+        <div class="view-header">
+          <h1 class="view-title">Stats</h1>
+        </div>
+        <div class="stats-grid" id="statsGrid">
+          <!-- injected by JS -->
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ═══════════════════ GAME DETAIL PANEL ═══════════════════ -->
+  <aside class="detail-panel" id="detailPanel">
+    <button class="detail-close" id="detailClose">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M18 6L6 18M6 6l12 12"/>
+      </svg>
+    </button>
+    <div class="detail-content" id="detailContent"></div>
+  </aside>
+  <div class="overlay" id="overlay"></div>
+
+  <!-- ═══════════════════ ADD / EDIT MODAL ═══════════════════ -->
+  <div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal" id="gameModal">
+      <div class="modal-header">
+        <h2 id="modalTitle">Add Game</h2>
+        <button class="modal-close" id="modalClose">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="gameForm">
+          <div class="form-cols">
+            <!-- Left column -->
+            <div class="form-col">
+              <div class="form-group">
+                <label>Title <span class="required">*</span></label>
+                <input type="text" id="f_title" required placeholder="e.g. Shadow of the Colossus" />
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Franchise</label>
+                  <input type="text" id="f_franchise" placeholder="e.g. Zelda" list="franchiseList" />
+                  <datalist id="franchiseList"></datalist>
+                </div>
+                <div class="form-group form-group--sm">
+                  <label>#</label>
+                  <input type="number" id="f_sequence" min="1" placeholder="—" />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Platform <span class="required">*</span></label>
+                  <input type="text" id="f_platform" required placeholder="PC, PS5…" list="platformList" />
+                  <datalist id="platformList"></datalist>
+                </div>
+                <div class="form-group">
+                  <label>Release Date</label>
+                  <input type="date" id="f_release_date" />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Developer</label>
+                  <input type="text" id="f_developer" placeholder="Studio name" />
+                </div>
+                <div class="form-group">
+                  <label>Publisher</label>
+                  <input type="text" id="f_publisher" placeholder="Publisher name" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Genres</label>
+                <div class="tag-input-wrap" id="genreTagWrap">
+                  <div class="tag-list" id="genreTags"></div>
+                  <input type="text" id="genreInput" placeholder="Type genre + Enter" list="genreList" />
+                  <datalist id="genreList"></datalist>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right column -->
+            <div class="form-col">
+              <div class="form-group">
+                <label>Status</label>
+                <div class="status-picker" id="statusPicker">
+                  <button type="button" class="status-opt active" data-val="NotStarted">Not Started</button>
+                  <button type="button" class="status-opt" data-val="Playing">Playing</button>
+                  <button type="button" class="status-opt" data-val="Completed">Completed</button>
+                  <button type="button" class="status-opt" data-val="Dropped">Dropped</button>
+                  <button type="button" class="status-opt" data-val="Backlog">Backlog</button>
+                  <button type="button" class="status-opt" data-val="Wishlist">Wishlist</button>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Progress <span class="muted">%</span></label>
+                  <div class="slider-wrap">
+                    <input type="range" id="f_progress" min="0" max="100" step="1" value="0" />
+                    <span class="slider-val" id="progressVal">0%</span>
+                  </div>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Playtime <span class="muted">hrs</span></label>
+                  <input type="number" id="f_playtime" min="0" step="0.5" placeholder="0" />
+                </div>
+                <div class="form-group">
+                  <label>Rating <span class="muted">/10</span></label>
+                  <div class="star-rating" id="starRating">
+                    <span class="star" data-v="1">★</span><span class="star" data-v="2">★</span>
+                    <span class="star" data-v="3">★</span><span class="star" data-v="4">★</span>
+                    <span class="star" data-v="5">★</span><span class="star" data-v="6">★</span>
+                    <span class="star" data-v="7">★</span><span class="star" data-v="8">★</span>
+                    <span class="star" data-v="9">★</span><span class="star" data-v="10">★</span>
+                  </div>
+                  <input type="hidden" id="f_rating" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Cover Art</label>
+                <div class="cover-drop" id="coverDrop">
+                  <img id="coverPreview" class="hidden" alt="Cover art preview" />
+                  <div class="cover-placeholder" id="coverPlaceholder">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                      <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+                      <polyline points="21 15 16 10 5 21"/>
+                    </svg>
+                    <span>Click or drop an image</span>
+                  </div>
+                </div>
+                <input type="hidden" id="f_cover_art_path" />
+              </div>
+              <div class="form-group">
+                <label>Notes</label>
+                <textarea id="f_notes" rows="3" placeholder="Thoughts, tips, spoiler warnings…"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn--ghost" id="cancelBtn">Cancel</button>
+            <button type="submit" class="btn btn--primary" id="submitBtn">Save Game</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ DELETE CONFIRM ═══════════════════ -->
+  <div class="confirm-backdrop hidden" id="confirmBackdrop">
+    <div class="confirm-dialog">
+      <p>Delete <strong id="confirmGameTitle"></strong>?</p>
+      <p class="confirm-sub">This action cannot be undone.</p>
+      <div class="confirm-actions">
+        <button class="btn btn--ghost" id="confirmCancel">Cancel</button>
+        <button class="btn btn--danger" id="confirmDelete">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>
