@@ -11,9 +11,9 @@ jobs:
       matrix:
         include:
           - platform: 'macos-latest'
-            args: 'aarch64-apple-darwin'
+            args: '--target aarch64-apple-darwin'
           - platform: 'macos-latest'
-            args: 'x86_64-apple-darwin'
+            args: '--target x86_64-apple-darwin'
           - platform: 'ubuntu-latest'
             args: ''
           - platform: 'windows-latest'
@@ -43,7 +43,6 @@ jobs:
         with:
           key: ${{ runner.os }}-tauri-${{ hashFiles('**/Cargo.lock') }}
 
-      # 1. This step compiles the app and uploads to the Draft Release
       - name: Build and release the Tauri app
         uses: tauri-apps/tauri-action@v1
         env:
@@ -54,17 +53,3 @@ jobs:
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
-
-      # 2. This step grabs the compiled files and saves them to the Actions dashboard
-      - name: Upload Artifacts to Action Summary
-        uses: actions/upload-artifact@v4
-        with:
-          name: gametrc-artifacts-${{ matrix.platform }}-${{ matrix.args || 'default' }}
-          path: |
-            src-tauri/target/release/bundle/dmg/*.dmg
-            src-tauri/target/release/bundle/msi/*.msi
-            src-tauri/target/release/bundle/nsis/*.exe
-            src-tauri/target/release/bundle/deb/*.deb
-            src-tauri/target/release/bundle/appimage/*.AppImage
-          retention-days: 7
-          if-no-files-found: ignore

@@ -6,8 +6,6 @@
 
 GameTrc is a desktop application for tracking and managing your video game library. Built with [Tauri](https://tauri.app/) and SQLite, it provides a sleek, native interface to catalog games, monitor progress, and visualize your gaming habits.
 
-[![Release](https://github.com/HushmKun/GameTrc/actions/workflows/main.yml/badge.svg)](https://github.com/HushmKun/GameTrc/actions/workflows/main.yml)
-
 ![GameTrc Screenshot](screenshots/home.png)
 
 ## Features
