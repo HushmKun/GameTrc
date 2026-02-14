@@ -83,11 +83,20 @@ function showToast(msg, type = "info") {
   }, 2800);
 }
 
+function resolveCover(path) {
+  if (!path) return null;
+  // Already a remote URL — use as-is
+  if (path.startsWith("http://") || path.startsWith("https://")) return path;
+  // Local filesystem path — convert for the asset protocol
+  return convertFileSrc(path);
+}
+
 function applyStagger(cards) {
   cards.forEach((c, i) => { c.style.animationDelay = `${i * 0.03}s`; });
 }
 
 const CHART_COLORS = ["#f59e0b", "#3b82f6", "#22c55e", "#a855f7", "#f97316", "#ec4899", "#06b6d4"];
+
 
 
 // =============================================================================
@@ -175,7 +184,7 @@ function renderGames() {
 
 function renderGridCard(g) {
   const coverHtml = g.cover_art_path
-    ? `<img src="${convertFileSrc(g.cover_art_path)}" alt="${g.title}" loading="lazy" />`
+    ? `<img src="${resolveCover(g.cover_art_path)}" alt="${g.title}" loading="lazy" />`
     : `<div class="card-cover-placeholder"><span class="cover-letter">${g.title.charAt(0).toUpperCase()}</span></div>`;
 
   const progressHtml = g.progress_percent != null
@@ -201,7 +210,7 @@ function renderGridCard(g) {
 
 function renderListCard(g) {
   const coverHtml = g.cover_art_path
-    ? `<img src="${convertFileSrc(g.cover_art_path)}" alt="${g.title}" loading="lazy" />`
+    ? `<img src="${resolveCover(g.cover_art_path)}" alt="${g.title}" loading="lazy" />`
     : `<div class="card-cover-placeholder"><span class="cover-letter">${g.title.charAt(0).toUpperCase()}</span></div>`;
 
   return `
@@ -244,7 +253,7 @@ function openDetail(id) {
   if (!game) return;
   state.selectedGameId = id;
 
-  const coverSrc   = game.cover_art_path ? convertFileSrc(game.cover_art_path) : null;
+  const coverSrc   = game.cover_art_path ? resolveCover(game.cover_art_path) : null;
   const coverHtml  = coverSrc
     ? `<img src="${coverSrc}" alt="${game.title}" />`
     : `<div class="detail-cover-placeholder"><span class="cover-letter">${game.title.charAt(0).toUpperCase()}</span></div>`;
@@ -252,7 +261,7 @@ function openDetail(id) {
   const genreTags      = game.genres.map(g => `<span class="detail-tag">${g}</span>`).join("");
   const screenshotsHtml = game.screenshots.length
     ? `<div class="detail-screenshots">${game.screenshots.map(s =>
-        `<div class="detail-screenshot"><img src="${convertFileSrc(s)}" /></div>`).join("")}</div>`
+        `<div class="detail-screenshot"><img src="${resolveCover(s)}" /></div>`).join("")}</div>`
     : "";
   const notesHtml = game.notes ? `<div class="detail-notes">${game.notes}</div>` : "";
 
@@ -513,7 +522,7 @@ function openModal(id = null) {
     $("f_cover_art_path").value   = game.cover_art_path || "";
 
     if (game.cover_art_path) {
-      $("coverPreview").src = convertFileSrc(game.cover_art_path);
+      $("coverPreview").src = resolveCover(game.cover_art_path);
       $("coverPreview").classList.remove("hidden");
       $("coverPlaceholder").classList.add("hidden");
     }
@@ -612,7 +621,7 @@ $("coverDrop").addEventListener("click", async () => {
 
     // `selected` is the absolute path on disk — convertFileSrc maps it to a WebView-safe URL.
     $("f_cover_art_path").value = selected;
-    $("coverPreview").src = convertFileSrc(selected);
+    $("coverPreview").src = resolveCover(selected);
     $("coverPreview").classList.remove("hidden");
     $("coverPlaceholder").classList.add("hidden");
   } catch (e) {

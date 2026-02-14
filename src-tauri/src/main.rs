@@ -8,6 +8,7 @@
 // RUST NOTE: `mod` declares a module. Rust looks for either
 //   src/<name>.rs  or  src/<name>/mod.rs
 // These four modules live in the src/ folder as separate .rs files.
+#![windows_subsystem = "windows"]
 mod models;
 mod db;
 mod commands;
