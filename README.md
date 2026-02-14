@@ -1,4 +1,6 @@
-![aaa](src-tauri/icons/icon.png)
+<p align="center">
+  <img src="src-tauri/icons/128x128@2x.png">
+</p>
 
 # GameTrc
 
