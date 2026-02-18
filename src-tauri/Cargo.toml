@@ -1,8 +1,8 @@
 [package]
 name = "gametrc"
-version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
+version = "1.2.0"
+description = "GameTrc is a desktop application for tracking and managing your video game library."
+authors = ["Hussein Mukhtar hussein@hushm.me"]
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -30,6 +30,7 @@ chrono     = { version = "0.4", features = ["serde"] }  # date/time handling
 dirs       = "5"         # OS-standard data directories
 thiserror  = "1"         # ergonomic custom error types
 uuid       = { version = "1", features = ["v4"] }        # unique IDs if needed
+ureq       = "2"         # simple blocking HTTP client for image downloads
 
 [profile.release]
 panic         = "abort"       # smaller binary — no panic unwinding

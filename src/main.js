@@ -1,4 +1,4 @@
-// app.js — GameTrc Frontend
+// app.js — Game Tracker Frontend
 //
 // Requires `"withGlobalTauri": true` in tauri.conf.json (under app.security).
 // Tauri then injects its full API onto window.__TAURI__ before the page loads,
@@ -11,7 +11,7 @@
 // ── Grab globals once, fail loudly if Tauri isn't present ────────────────────
 if (!window.__TAURI__) {
   throw new Error(
-    '[GameTrc] window.__TAURI__ is not defined. ' +
+    '[Game Tracker] window.__TAURI__ is not defined. ' +
     'Make sure "withGlobalTauri": true is set in tauri.conf.json under app.security.'
   );
 }
@@ -72,6 +72,14 @@ function fmtDate(d)   {
     : "—";
 }
 
+function resolveCover(path) {
+  if (!path) return null;
+  // Already a remote URL — use as-is
+  if (path.startsWith("http://") || path.startsWith("https://")) return path;
+  // Local filesystem path — convert for the asset protocol
+  return convertFileSrc(path);
+}
+
 function showToast(msg, type = "info") {
   const el = document.createElement("div");
   el.className = `toast ${type}`;
@@ -83,20 +91,11 @@ function showToast(msg, type = "info") {
   }, 2800);
 }
 
-function resolveCover(path) {
-  if (!path) return null;
-  // Already a remote URL — use as-is
-  if (path.startsWith("http://") || path.startsWith("https://")) return path;
-  // Local filesystem path — convert for the asset protocol
-  return convertFileSrc(path);
-}
-
 function applyStagger(cards) {
   cards.forEach((c, i) => { c.style.animationDelay = `${i * 0.03}s`; });
 }
 
 const CHART_COLORS = ["#f59e0b", "#3b82f6", "#22c55e", "#a855f7", "#f97316", "#ec4899", "#06b6d4"];
-
 
 
 // =============================================================================
@@ -500,6 +499,13 @@ function openModal(id = null) {
   $("coverPreview").classList.add("hidden");
   $("coverPlaceholder").classList.remove("hidden");
   $("progressVal").textContent = "0%";
+  $("coverUrlInput").value = "";
+
+  // Reset cover art tabs to Upload
+  document.querySelectorAll(".cover-tab").forEach(t => t.classList.remove("active"));
+  document.querySelector(".cover-tab[data-tab='upload']").classList.add("active");
+  document.querySelectorAll(".cover-tab-content").forEach(c => c.classList.remove("active"));
+  $("uploadTab").classList.add("active");
 
   $("statusPicker").querySelectorAll(".status-opt").forEach(b => {
     b.classList.toggle("active", b.dataset.val === "NotStarted");
@@ -522,6 +528,18 @@ function openModal(id = null) {
     $("f_cover_art_path").value   = game.cover_art_path || "";
 
     if (game.cover_art_path) {
+      // Check if it's a URL or local path and switch tabs accordingly
+      const isUrl = game.cover_art_path.startsWith("http://") || game.cover_art_path.startsWith("https://");
+      
+      if (isUrl) {
+        // Switch to URL tab
+        document.querySelectorAll(".cover-tab").forEach(t => t.classList.remove("active"));
+        document.querySelector(".cover-tab[data-tab='url']").classList.add("active");
+        document.querySelectorAll(".cover-tab-content").forEach(c => c.classList.remove("active"));
+        $("urlTab").classList.add("active");
+        $("coverUrlInput").value = game.cover_art_path;
+      }
+      
       $("coverPreview").src = resolveCover(game.cover_art_path);
       $("coverPreview").classList.remove("hidden");
       $("coverPlaceholder").classList.add("hidden");
@@ -609,6 +627,49 @@ $("genreInput").addEventListener("keydown", e => {
 });
 $("genreTagWrap").addEventListener("click", () => $("genreInput").focus());
 
+// Cover art tabs
+document.querySelectorAll(".cover-tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    const targetTab = tab.dataset.tab;
+    document.querySelectorAll(".cover-tab").forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+    document.querySelectorAll(".cover-tab-content").forEach(c => c.classList.remove("active"));
+    $(targetTab === "upload" ? "uploadTab" : "urlTab").classList.add("active");
+  });
+});
+
+// Load image from URL
+$("loadUrlBtn").addEventListener("click", async () => {
+  const url = $("coverUrlInput").value.trim();
+  if (!url) {
+    showToast("Please enter a URL", "error");
+    return;
+  }
+  
+  if (!url.startsWith("http://") && !url.startsWith("https://")) {
+    showToast("URL must start with http:// or https://", "error");
+    return;
+  }
+  
+  $("loadUrlBtn").disabled = true;
+  $("loadUrlBtn").textContent = "Loading...";
+  
+  try {
+    // Just store the URL for now — it will be processed on form submit
+    $("f_cover_art_path").value = url;
+    $("coverPreview").src = url; // Show preview directly for remote URLs
+    $("coverPreview").classList.remove("hidden");
+    $("coverPlaceholder").classList.add("hidden");
+    showToast("Image loaded", "success");
+  } catch (e) {
+    console.error("Failed to load URL:", e);
+    showToast("Failed to load image", "error");
+  } finally {
+    $("loadUrlBtn").disabled = false;
+    $("loadUrlBtn").textContent = "Load Image";
+  }
+});
+
 // Cover art — use Tauri's native dialog instead of a hidden <input type="file">
 $("coverDrop").addEventListener("click", async () => {
   try {
@@ -619,7 +680,7 @@ $("coverDrop").addEventListener("click", async () => {
     });
     if (!selected) return;
 
-    // `selected` is the absolute path on disk — convertFileSrc maps it to a WebView-safe URL.
+    // `selected` is the absolute path on disk
     $("f_cover_art_path").value = selected;
     $("coverPreview").src = resolveCover(selected);
     $("coverPreview").classList.remove("hidden");
@@ -683,6 +744,19 @@ $("gameForm").addEventListener("submit", async e => {
   $("submitBtn").textContent = "Saving…";
 
   try {
+    // Process cover image first (copy local file or download URL)
+    if (input.cover_art_path) {
+      try {
+        const processedPath = await invoke("process_cover_image", { input: input.cover_art_path });
+        input.cover_art_path = processedPath;
+      } catch (imgErr) {
+        console.error("Image processing failed:", imgErr);
+        showToast("Warning: Could not process cover image", "error");
+        // Continue saving without the cover art
+        input.cover_art_path = null;
+      }
+    }
+
     if (state.editingGameId) {
       await invoke("update_game", { id: state.editingGameId, input });
       showToast("Game updated!", "success");
@@ -750,7 +824,7 @@ document.querySelectorAll(".nav-item").forEach(btn => {
     $("libraryView").classList.toggle("active", !isStats);
     $("statsView").classList.toggle("active",   isStats);
     $("sidebarFilters").style.display = isStats ? "none" : "";
-    // $("topbar").style.display         = isStats ? "none" : "";
+    $("topbar").style.display         = isStats ? "none" : "";
 
     if (!isStats) {
       $("viewTitle").textContent = titlesMap[state.activeView];

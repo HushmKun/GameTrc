@@ -12,6 +12,7 @@
 mod models;
 mod db;
 mod commands;
+mod images;
 
 use tauri::Manager;
 use std::sync::Mutex;
@@ -27,7 +28,7 @@ fn main() {
         .plugin(tauri_plugin_dialog::init())
         // tauri-plugin-fs gives the frontend safe access to the filesystem
         .plugin(tauri_plugin_fs::init())
-        
+
         // ── One-time setup ───────────────────────────────────────────────────
         .setup(|app| {
             // Resolve the OS-standard data directory and open our SQLite DB
@@ -74,6 +75,8 @@ fn main() {
             commands::get_platforms,
             commands::get_franchises,
             commands::get_genres,
+            // Image processing
+            commands::process_cover_image,
         ])
 
         // ── Start the event loop ─────────────────────────────────────────────
