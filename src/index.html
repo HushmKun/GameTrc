@@ -264,16 +264,32 @@
               </div>
               <div class="form-group">
                 <label>Cover Art</label>
-                <div class="cover-drop" id="coverDrop">
-                  <img id="coverPreview" class="hidden" alt="Cover art preview" />
-                  <div class="cover-placeholder" id="coverPlaceholder">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
-                      <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
-                      <polyline points="21 15 16 10 5 21"/>
-                    </svg>
-                    <span>Click or drop an image</span>
+                <div class="cover-tabs">
+                  <button type="button" class="cover-tab active" data-tab="upload">Upload</button>
+                  <button type="button" class="cover-tab" data-tab="url">URL</button>
+                </div>
+                
+                <!-- Upload tab content -->
+                <div class="cover-tab-content active" id="uploadTab">
+                  <div class="cover-drop" id="coverDrop">
+                    <img id="coverPreview" class="hidden" alt="Cover art preview" />
+                    <div class="cover-placeholder" id="coverPlaceholder">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+                        <polyline points="21 15 16 10 5 21"/>
+                      </svg>
+                      <span>Click or drop an image</span>
+                    </div>
+                    <!-- file picking is handled by Tauri's native dialog, no <input type="file"> needed -->
                   </div>
                 </div>
+                
+                <!-- URL tab content -->
+                <div class="cover-tab-content" id="urlTab">
+                  <input type="text" id="coverUrlInput" placeholder="https://example.com/cover.jpg" />
+                  <button type="button" class="btn btn--ghost" id="loadUrlBtn" style="margin-top:8px;width:100%">Load Image</button>
+                </div>
+                
                 <input type="hidden" id="f_cover_art_path" />
               </div>
               <div class="form-group">

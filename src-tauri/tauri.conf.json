@@ -1,7 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "GameTrc",
-  "version": "1.0.0",
   "identifier": "me.hushm.gametrc",
   "build": {
     "frontendDist": "../src"

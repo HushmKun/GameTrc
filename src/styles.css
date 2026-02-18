@@ -962,6 +962,32 @@ body {
 .confirm-sub { color: var(--text-3) !important; font-size: 12px !important; }
 .confirm-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
 
+/* Cover drop */
+.cover-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 10px;
+  background: var(--bg-3);
+  padding: 3px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-mid);
+}
+.cover-tab {
+  flex: 1;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-3);
+  transition: all var(--transition);
+  background: transparent;
+}
+.cover-tab:hover { color: var(--text); }
+.cover-tab.active { background: var(--bg); color: var(--accent); }
+
+.cover-tab-content { display: none; }
+.cover-tab-content.active { display: block; }
+#coverUrlInput {width:100%;}
 /* ── Toast ───────────────────────────────────────────────────── */
 .toast-container {
   position: fixed; bottom: 24px; right: 24px;

@@ -42,6 +42,12 @@ impl From<rusqlite::Error> for CommandError {
     }
 }
 
+impl From<crate::images::ImageError> for CommandError {
+    fn from(e: crate::images::ImageError) -> Self {
+        CommandError(e.to_string())
+    }
+}
+
 // Shorthand type alias — `CmdResult<T>` is `Result<T, CommandError>`
 type CmdResult<T> = Result<T, CommandError>;
 
@@ -175,4 +181,23 @@ pub fn get_genres(state: State<AppState>) -> CmdResult<Vec<String>> {
         .collect::<Result<Vec<String>, _>>()
         .map_err(|e| CommandError(e.to_string()))?;
     Ok(genres)
+}
+
+// ---------------------------------------------------------------------------
+// Image processing
+// ---------------------------------------------------------------------------
+
+/// Process a cover image: copy a local file or download a remote URL.
+///
+/// Takes either a local filesystem path or an http(s):// URL.
+/// Saves the image to app_data_dir/images/ with a unique filename.
+/// Returns the absolute path to the saved image, which should be stored in the DB.
+///
+/// Example JS call:
+///   const savedPath = await invoke("process_cover_image", { input: "https://example.com/cover.jpg" });
+///   // or
+///   const savedPath = await invoke("process_cover_image", { input: "/home/user/Pictures/game.png" });
+#[tauri::command]
+pub fn process_cover_image(app: tauri::AppHandle, input: String) -> CmdResult<String> {
+    crate::images::process_image(&app, &input).map_err(Into::into)
 }
